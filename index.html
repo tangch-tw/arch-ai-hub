@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>建築系 AI 教學工具</title>
+<style>
+:root{
+  --bg:#f7f5f0; --card:#ffffff; --ink:#272521; --dim:#6b655c; --line:#e0dbd1;
+  --green:#1f4d3d; --green2:#2c6b55; --amber:#8a6000; --amberbg:#fdf6e3;
+  --rose:#8c2f39; --rosebg:#fbeef0; --sky:#1b4f72; --skybg:#eaf2f8; --mark:#ffe9a8;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1a1916; --card:#232119; --ink:#ece7dd; --dim:#a69e92; --line:#3a362e;
+    --green:#8fd3b8; --green2:#a9e0c8; --amber:#e8c477; --amberbg:#332b17;
+    --rose:#e9a3ab; --rosebg:#3a2024; --sky:#9ec9e8; --skybg:#1b2b38; --mark:#5c4a12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1a1916; --card:#232119; --ink:#ece7dd; --dim:#a69e92; --line:#3a362e;
+  --green:#8fd3b8; --green2:#a9e0c8; --amber:#e8c477; --amberbg:#332b17;
+  --rose:#e9a3ab; --rosebg:#3a2024; --sky:#9ec9e8; --skybg:#1b2b38; --mark:#5c4a12;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.75 "Microsoft JhengHei","微軟正黑體","PingFang TC","Noto Sans TC",system-ui,sans-serif;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+header{background:var(--green);color:#f7f5f0;padding:18px 0 14px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) header{background:#16231e;color:var(--ink)}}
+:root[data-theme="dark"] header{background:#16231e;color:var(--ink)}
+header h1{margin:0;font-size:19px;letter-spacing:.4px}
+header .sub{font-size:12.5px;opacity:.85;margin-top:3px}
+nav.tabs{display:flex;gap:6px;margin-top:13px;flex-wrap:wrap}
+nav.tabs button{border:0;border-radius:6px 6px 0 0;padding:8px 14px;font-size:14px;cursor:pointer;
+  background:rgba(255,255,255,.14);color:inherit;font-family:inherit}
+nav.tabs button[aria-selected="true"]{background:var(--bg);color:var(--green);font-weight:700}
+main{padding:18px 0 60px}
+.panel{display:none}.panel.on{display:block}
+.grid{display:grid;grid-template-columns:238px minmax(0,1fr);gap:20px;align-items:start}
+.grid>*{min-width:0;max-width:100%}
+@media(max-width:860px){.grid{display:flex;flex-direction:column}.side{position:static;order:2}.maincol{order:1}}
+.side{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px;position:sticky;top:12px}
+.side>summary{display:none}
+@media(max-width:860px){
+  .side>summary{display:block;cursor:pointer;font-weight:700;font-size:14.5px;list-style:none}
+  .side>summary::after{content:"　▾"}
+  .side[open]>summary::after{content:"　▴"}
+}
+.side h3{margin:0 0 8px;font-size:12.5px;color:var(--dim);letter-spacing:.6px}
+.side h3.gap{margin-top:16px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{border:1px solid var(--line);background:transparent;color:inherit;border-radius:999px;
+  padding:4px 10px;font-size:12.5px;cursor:pointer;font-family:inherit}
+.chip[aria-pressed="true"]{background:var(--green);color:var(--bg);border-color:var(--green);font-weight:700}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#16231e}}
+:root[data-theme="dark"] .chip[aria-pressed="true"]{color:#16231e}
+input[type=search],textarea{width:100%;padding:8px 10px;border:1px solid var(--line);
+  border-radius:6px;background:var(--card);color:inherit;font-size:14px;font-family:inherit}
+.searchbox{display:flex;gap:8px;margin-bottom:10px}
+.searchbox input{flex:1;font-size:15.5px;padding:11px 12px}
+.btn{border:1px solid var(--line);background:var(--card);color:inherit;border-radius:6px;
+  padding:8px 14px;font-size:14px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.btn.pri{background:var(--green);color:var(--bg);border-color:var(--green);font-weight:700}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.pri{color:#16231e}}
+:root[data-theme="dark"] .btn.pri{color:#16231e}
+.count{font-size:13px;color:var(--dim);margin:10px 2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px 16px;margin-bottom:11px}
+.card.teacher{border-left:4px solid var(--rose)}
+.card h4{margin:0 0 3px;font-size:16px;line-height:1.5}
+.card .pid{font-size:12px;color:var(--dim);margin-bottom:8px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.tg{font-size:11.5px;padding:2px 8px;border-radius:4px;border:1px solid var(--line);color:var(--dim)}
+.tg.st{background:var(--green);color:var(--bg);border-color:var(--green);font-weight:700}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tg.st{color:#16231e}}
+:root[data-theme="dark"] .tg.st{color:#16231e}
+.tg.who{background:var(--rosebg);color:var(--rose);border-color:var(--rose)}
+.tg.pos{background:var(--skybg);color:var(--sky);border-color:var(--sky)}
+.res{font-size:13.5px;color:var(--dim);margin:0 0 9px}
+.res b{color:var(--green2)}
+.body{white-space:pre-wrap;font-size:14.5px;line-height:1.85;background:var(--bg);border:1px solid var(--line);
+  border-radius:6px;padding:11px 13px}
+mark{background:var(--mark);color:inherit;padding:0 1px;border-radius:2px}
+.warn{margin-top:9px;background:var(--amberbg);border:1px solid var(--amber);color:var(--amber);
+  border-radius:6px;padding:8px 11px;font-size:13px}
+.use{margin-top:9px;font-size:13px;color:var(--dim)}
+.acts{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px}
+.fill{margin-top:11px;border-top:1px dashed var(--line);padding-top:11px;display:grid;gap:9px}
+.fill label{display:grid;gap:4px;font-size:13px;color:var(--dim)}
+.fill textarea{min-height:42px;resize:vertical;font-size:14.5px}
+.tip{background:var(--rosebg);border:1px solid var(--rose);color:var(--rose);border-radius:8px;
+  padding:11px 14px;font-size:13.5px;line-height:1.8;margin-bottom:12px}
+.tip b{color:inherit}
+.tip ol{margin:6px 0 0;padding-left:1.4em}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:9px;padding:28px 16px;text-align:center;color:var(--dim)}
+.doc{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:16px 18px;max-width:46em}
+.doc h3{margin:18px 0 6px;font-size:15.5px;color:var(--green2)}
+.doc h3:first-child{margin-top:0}
+.doc p{margin:0 0 8px;font-size:14.5px}
+.doc a{color:var(--green2)}
+#cover{position:fixed;inset:0;z-index:50;background:var(--green);color:#f7f5f0;
+  display:flex;align-items:center;justify-content:center;padding:32px 20px;overflow:auto}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #cover{background:#16231e;color:var(--ink)}}
+:root[data-theme="dark"] #cover{background:#16231e;color:var(--ink)}
+.cov{max-width:640px;text-align:center}
+.cov .eyebrow{font-size:14px;letter-spacing:.14em;opacity:.85}
+.cov h2{font-size:clamp(30px,8vw,46px);margin:14px 0 10px;letter-spacing:2px;line-height:1.25}
+.cov .courses{font-size:14px;opacity:.9;line-height:2;border-top:1px solid rgba(247,245,240,.35);
+  border-bottom:1px solid rgba(247,245,240,.35);padding:10px 0;margin:16px 0 20px}
+.cov .note{font-size:15px;line-height:2;opacity:.95;margin:0 0 26px}
+.cov .note b{font-weight:700}
+.cov .enter{font:inherit;font-size:17px;font-weight:700;padding:13px 42px;border-radius:999px;
+  border:0;cursor:pointer;background:#f7f5f0;color:var(--green);letter-spacing:2px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cov .enter{background:var(--green);color:#16231e}}
+:root[data-theme="dark"] .cov .enter{background:var(--green);color:#16231e}
+.cov .enter:hover{opacity:.9}
+.cov .device{font-size:14px;margin:0 auto 20px;padding:8px 16px;display:block;width:fit-content;max-width:100%;
+  border:1px solid rgba(247,245,240,.45);border-radius:8px;background:rgba(247,245,240,.08);letter-spacing:.5px}
+.cov .dl{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:22px}
+.cov .dl a{font-size:14px;padding:8px 18px;border-radius:999px;text-decoration:none;
+  border:1px solid rgba(247,245,240,.55);color:inherit}
+.cov .dl a:hover{background:rgba(247,245,240,.12)}
+.cov .foot{font-size:13px;opacity:.8;margin-top:26px;line-height:1.9}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:20px;background:var(--ink);color:var(--bg);
+  padding:8px 16px;border-radius:6px;font-size:14px;z-index:20}
+</style>
+<style>
+.hero{padding:34px 0 10px}
+.hero h2{font-size:clamp(26px,5vw,36px);margin:0 0 10px;line-height:1.3}
+.hero p{margin:0 0 6px;max-width:44em;font-size:15.5px}
+.sec{font-size:13px;color:var(--dim);letter-spacing:.6px;margin:30px 2px 12px;padding-bottom:7px;border-bottom:1px solid var(--line)}
+.sites{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+.site{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:16px 18px;display:flex;flex-direction:column;gap:9px}
+.site h3{margin:0;font-size:17.5px;line-height:1.4}
+.when{font-size:13.5px;color:var(--green2);font-weight:700}
+.site p{margin:0;font-size:14px;line-height:1.85;flex:1}
+.ts{display:flex;flex-wrap:wrap;gap:5px}
+.ts span{font-size:11.5px;padding:2px 8px;border-radius:4px;border:1px solid var(--line);color:var(--dim)}
+.go{align-self:flex-start;text-decoration:none;font-size:14px;font-weight:700;padding:8px 18px;border-radius:6px;background:var(--green);color:var(--bg);border:1px solid var(--green)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .go{color:#16231e}}
+:root[data-theme="dark"] .go{color:#16231e}
+.go:hover{opacity:.9}
+.url{font-size:12px;color:var(--dim);word-break:break-all}
+.front{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:9px;padding:16px 18px;display:grid;gap:9px}
+.front h3{margin:0;font-size:17.5px}
+.front p{margin:0;font-size:14px;line-height:1.85}
+.acct{background:var(--amberbg);border:1px solid var(--amber);color:var(--amber);border-radius:6px;padding:9px 12px;font-size:13px;line-height:1.75}
+.note{background:var(--rosebg);border:1px solid var(--rose);color:var(--rose);border-radius:8px;padding:11px 14px;font-size:13.5px;line-height:1.85;margin-top:26px}
+footer{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--dim);line-height:1.9}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>建築系 AI 教學工具</h1>
+    <div class="sub">中國科技大學　規劃與設計學院　建築系　｜　教育部實作場域設備精進計畫成果</div>
+  </div>
+</header>
+<main><div class="wrap">
+  <div class="hero">
+    <h2>依你現在要做的事，挑一個進去</h2>
+    <p>以下工具均由建築系團隊自行開發，全部為靜態網頁，不需伺服器與資料庫，也不需安裝。開啟即可操作。</p>
+  </div>
+
+  <div class="sec">查法規、做檢核、練考題、建模型　｜　免登入，開啟即用</div>
+  <div class="sites">
+    <article class="site">
+      <h3>建築設計課程法規導航</h3>
+      <div class="when">設計課任何階段要查法規、或要算建蔽容積時</div>
+      <p>依設計課工作階段整理的法規查詢介面，收錄一千二百七十九筆條文卡片，依 D1 至 D5 分類。每一條都附原文與官方連結，可點回全國法規資料庫核對。另有建蔽容積、高度上限、免計容積、陽臺梯廳免計、停車位數量、車道坡度六項設計快算，逐步列出算式。</p>
+      <div class="ts"><span>條文原文，非生成</span><span>白話提問可用</span><span>設計快算六項</span></div>
+      <a class="go" href="https://tangch-tw.github.io/arch-design-law/" target="_blank" rel="noopener">開啟</a>
+      <div class="url">tangch-tw.github.io/arch-design-law/</div>
+    </article>
+    <article class="site">
+      <h3>建築法規檢核系統</h3>
+      <div class="when">拿到基地資料後，要盤點禁限建與技術規則時</div>
+      <p>輸入地籍資料自動推定基地條件，逐條列出應檢討法規並標示判定依據，分為已可判定、推定待查證、無法判定三級。另含建築技術規則四項檢核：樓梯種類、通道規定、防火構造、樓地板面積，可匯出 Excel。</p>
+      <div class="ts"><span>判定分三級</span><span>不以推測取代查證</span><span>可匯出 Excel</span></div>
+      <a class="go" href="https://tangch-tw.github.io/arch-code-review/" target="_blank" rel="noopener">開啟</a>
+      <div class="url">tangch-tw.github.io/arch-code-review/</div>
+    </article>
+    <article class="site">
+      <h3>國家考試題庫複習系統</h3>
+      <div class="when">準備國家考試、或想檢驗自己答題是否抓到要點時</div>
+      <p>收錄一○四至一一五年申論題四十九題，二十七種考點法規標籤。作答後即時給分，逐項標示命中與未命中的得分要點，並列出法源條號與完整參考答案。未達七分自動納入錯題本。</p>
+      <div class="ts"><span>四十九題全數收錄</span><span>即時評分與要點檢核</span><span>錯題本</span></div>
+      <a class="go" href="https://tangch-tw.github.io/moex-construction-law/" target="_blank" rel="noopener">開啟</a>
+      <div class="url">tangch-tw.github.io/moex-construction-law/</div>
+    </article>
+    <article class="site">
+      <h3>真實街景 3D 量體生成器</h3>
+      <div class="when">做基地分析、要建立周邊量體模型時</div>
+      <p>在地圖上選取範圍，直接匯出 OBJ 基地模型，供設計課建立周邊量體使用，不必自己一棟一棟建。</p>
+      <div class="ts"><span>地圖選區</span><span>匯出 OBJ</span><span>可直接進設計課</span></div>
+      <a class="go" href="https://tangch-tw.github.io/3d-site-generator/" target="_blank" rel="noopener">開啟</a>
+      <div class="url">tangch-tw.github.io/3d-site-generator/</div>
+    </article>
+  </div>
+
+  <div class="sec">不知道怎麼問？先到這裡取用提示詞</div>
+  <div class="front">
+    <h3>AI 提示詞生成器</h3>
+    <div class="when">不知道該怎麼問 AI、或想先確認這件事該不該交給 AI 時</div>
+    <p>依 115 學年度第 1 學期授課大綱編成，涵蓋建築設計、敷地計畫、建築構造學、建築物理環境、結構行為、建築結構學、建築設備、建築法規八門課，共七十四則。選定課程與週次後，只顯示當週用得到的幾則，單元名稱自動帶入。每一則都標示 AI 離開之後學生應留下的能力，作為該次作業的驗收重點。</p>
+    <div class="acct">本項與上列四套不同：提示詞需貼到 AI 對話工具才會產生回覆。學生請以學校 gm.cute.edu.tw 帳號登入 Gemini Pro 學術版使用，校方不另增支。</div>
+    <a class="go" href="https://tangch-tw.github.io/arch-ai-prompts/" target="_blank" rel="noopener">開啟</a>
+    <div class="url">tangch-tw.github.io/arch-ai-prompts/</div>
+  </div>
+
+  <div class="note">
+    <b>法規與數值一律自行查證。</b>上列工具的設計原則一致：條文給原文與官方連結，計算列出過程，無法判定者標示為須查證，不以推測取代查證。凡要寫進作業、圖說或報告的條號與數值，請回到全國法規資料庫或主管機關公告核對。
+  </div>
+
+  <footer>
+    中國科技大學規劃與設計學院建築系　｜　教育部實作場域設備精進計畫<br>
+    本頁所列工具均為靜態網頁部署，無伺服器、無資料庫、無授權費用。<br>
+    更新日期：一一五年十月二十二日
+  </footer>
+</div></main>
+</body>
+</html>
